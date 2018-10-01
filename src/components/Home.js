@@ -1,9 +1,11 @@
 import React, { Component } from "react";
 import { inject, observer } from "mobx-react";
+import { Message } from 'semantic-ui-react'
 
 @inject("store")
 @observer
 export default class Home extends Component {
+
 	constructor(props) {
 		console.log("home constructor")
 		super(props);
@@ -18,31 +20,42 @@ export default class Home extends Component {
      
     componentDidUpdate(){
         console.log('home componentDidUpdate');
-    }
+	}
+	
+	// for flash
+	handleDismiss = () => {
+		this.store.appState.successFlash = null;
+	}
 
 	render() {
-		const store = this.store;
+		const { errorFlash, successFlash } = this.store.appState;
+
+		var successFlashView = null;
+		if (successFlash) {
+			successFlashView = (
+                <Message success onDismiss={this.handleDismiss} content={successFlash}/>
+			);
+		}
+        var errorFlashView = null;
+        if(errorFlash) {
+            errorFlashView = (
+                <Message error onDismiss={this.handleDismiss} content={errorFlash} />
+            );
+		}
+		
 		return (
 			<div className="page home">
 				<header>
+					<div>
+						{ errorFlashView }
+						{ successFlashView }
+					</div>
 					<div className="hero-unit">
 						<div className="react-logo" />
-						<h1>React MobX React-Router 4 Boilerplate</h1>
-					</div>
-					<div className="hero-subunit">
-						<h4>
-							A simple starting point for React with routing, data-fetching and state management!
-						</h4>
-					</div>
-					<div className="github-buttons">
-						<a
-							href="https://github.com/mhaagens/react-mobx-react-router4-boilerplate"
-							target="_blank"
-						>
-							Download from GitHub
-						</a>
+						<h1>Closers! naddic games</h1>
 					</div>
 				</header>
+				
 				<main>
 					<div className="section-header">
 						<h3>Included libraries</h3>

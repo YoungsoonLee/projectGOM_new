@@ -3,6 +3,7 @@ import axios from "axios";
 import validator from 'validator';
 
 import * as AuthAPI from '../lib/api/auth';
+import * as UserAPI from '../lib/api/user';
 
 import storage from '../lib/storage';
 import redirect from '../lib/redirect';
@@ -24,6 +25,8 @@ export default class AppState {
   @observable loggedInUserInfo;
   @observable error;
   @observable loading;
+  @observable errorFlash;
+  @observable successFlash;
 
   constructor() {
     this.authenticated = false;
@@ -38,6 +41,8 @@ export default class AppState {
     this.password = '';
     this.error = null;
     this.loading = 'off';
+    this.errorFlash = null;
+    this.successFlash = null;
 
     //for signup and login
     this.userInfo = {
@@ -73,8 +78,42 @@ export default class AppState {
     this.userInfo.email = '';
     this.userInfo.password = '';
 
+    this.setClearMessage();
+  }
+
+  @action setAuthenticated(auth, displayname, balance, gravater) {
+    console.log("setAuth: ", displayname);
+    this.authenticated = auth;
+    this.loggedInUserInfo.displayname = displayname;
+    this.loggedInUserInfo.balance = balance;
+    this.loggedInUserInfo.gravatar = gravater;
+  }
+
+  @action  setInitLoggedInUserInfo() {
+    storage.remove('___GOM___');
+
+    this.authenticated = false;
+
+    //this.loggedInUserInfo.uid = '';
+    this.loggedInUserInfo.displayname = '';
+    this.loggedInUserInfo.balance = '0';
+    this.loggedInUserInfo.gravatar = '';
+
+    this.setClearMessage();
+  }
+
+  @action setClearMessage() {
     this.error = null;
-    //this.setLoading(false);
+    this.errorFlash = null;
+    this.successFlash = null;
+  }
+
+  @action setSuccessFlashMessage(msg) {
+    this.successFlash = msg
+  }
+
+  @action setErrorFlashMessage(msg) {
+    this.errorFlash = msg
   }
 
   // Signup
@@ -114,7 +153,7 @@ export default class AppState {
         redirect.set(history,lastLocation);
 
         // flash message
-        //this.successFlash = 'Welcome ! ' + respData.data.data.displayname;
+        this.setSuccessFlashMessage('Welcome ! ' + respData.data.data.displayname);
 
       }catch(err){
         if (err.response.data) {
@@ -159,6 +198,9 @@ export default class AppState {
         //await this.checkAuth();
 
         redirect.set(history,lastLocation);
+
+        // flash message
+        this.setSuccessFlashMessage('Welcome ! ' + this.userInfo.displayname);
 
       }catch(err){
         //console.log(err);
@@ -225,6 +267,9 @@ export default class AppState {
           redirect.set(history,lastLocation);
 
           //this.checkAuth();
+
+          // flash message
+          this.setSuccessFlashMessage('Welcome ! ' + respData.data.data.displayname);
   
         }).catch((err)=>{
           console.log("err ", err);
@@ -246,25 +291,31 @@ export default class AppState {
   }
 
 
-  @action setAuthenticated(auth, displayname, balance, gravater) {
-    console.log("setAuth: ", displayname);
-    this.authenticated = auth;
-    this.loggedInUserInfo.displayname = displayname;
-    this.loggedInUserInfo.balance = balance;
-    this.loggedInUserInfo.gravatar = gravater;
+  async confirmEmail(confirm_token, history) {
+    let data = null;
+    try{ 
+      data = await UserAPI.confirmEmail(confirm_token);
+    }catch(err){
+      this.errorFlash = err.response.data.message;
+    }
+
+    //console.log(data);
+
+    if(!data) {
+      //this.errorFlash = 'token is invalid or has expired. try resend again.';
+      this.setErrorFlashMessage('token is invalid or has expired. try resend again.');
+      history.push('/invalidConfirmEmail');
+    }else{
+      //this.successFlash = 'email confirm success. thank you. enjoy after login.'
+      this.setSuccessFlashMessage('email confirm success. thank you. enjoy after login.');
+      // go to login
+      history.push('/login');
+    }
   }
 
-  @action  setInitLoggedInUserInfo() {
-    storage.remove('___GOM___');
 
-    this.authenticated = false;
 
-    //this.loggedInUserInfo.uid = '';
-    this.loggedInUserInfo.displayname = '';
-    this.loggedInUserInfo.balance = '0';
-    this.loggedInUserInfo.gravatar = '';
-  }
-
+  // not use below
   async fetchData(pathname, id) {
     let { data } = await axios.get(
       `https://jsonplaceholder.typicode.com${pathname}`

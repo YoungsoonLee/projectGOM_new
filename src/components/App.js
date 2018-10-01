@@ -11,6 +11,7 @@ import TopBar from "./TopBar";
 import NotFound from "./NotFound";
 import Home from "./Home";
 import { Login, Logout, Signup } from './auth/index';
+import {ConfirmEmail, InvalidConfirmEmail} from './user/index';
 
 @withRouter
 @inject("store")
@@ -41,25 +42,26 @@ export default class App extends Component {
 				<TopBar />
 				<LastLocationProvider>
 					<Switch>
-						
 						<Route exact path="/" component={Home}/>
 						<Route path="/login" component={Login}/>
 						<Route path="/signup" component={Signup}/>
 
-						<Route component={NotFound}/> 
+						<Route path="/confirmEmail/:token" component={ConfirmEmail} />
+						<Route path="/invalidConfirmEmail" component={InvalidConfirmEmail} />
 
+						<Route component={NotFound}/> 
 					</Switch>
 				</LastLocationProvider>
 				<footer>
 						{testval}
-						<a href="https://twitter.com/mhaagens" target="_blank">
-							@mhaagens
+						<a href="https://twitter.com/naddicgames" target="_blank">
+							@naddic games
 						</a>
 						{" "}
-						| github:
+						| officail korean website:
 						{" "}
-						<a href="https://github.com/mhaagens" target="_blank">
-							mhaagens
+						<a href="http://closers.nexon.com" target="_blank">
+							nexon closers
 						</a>
 					</footer>
 				{/*

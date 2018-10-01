@@ -17,5 +17,3 @@ export const localRegister = ({displayname,email,password}) => axios.post('/v1/a
 export const localLogin = ({displayname, password}) => axios.post('/v1/auth/login', {displayname, password});
 export const checkLoginStatus = (token) => axios.get('/v1/auth/checkLogin', {headers: {Authorization: token}});
 export const socialAuth = ({provider, accessToken, email, providerId, picture}) => axios.post('/v1/auth/social', {provider, accessToken, email, providerId, picture});
-
-export const socialRegister = ({displayname,provider,accessToken}) => axios.post('/api/v1.0/auth/register/' + provider, {displayname,accessToken});

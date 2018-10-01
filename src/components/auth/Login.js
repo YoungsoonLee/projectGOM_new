@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { inject, observer } from "mobx-react";
 import { Redirect } from "react-router-dom";
 
-import { Container, Button, Dimmer, Loader, Message, Grid, Form, Segment, Input, Divider, Label, Icon } from 'semantic-ui-react'
+import { Container, Button, Dimmer, Loader, Header, Grid, Form, Segment, Input, Divider, Message, Icon } from 'semantic-ui-react'
 
 import Social from './Social';
 
@@ -38,14 +38,32 @@ export default class Login extends Component {
 		this.store.setLoading('on');
 		const {history, lastLocation} = this.props;
 		this.store.Login(history, lastLocation);
-	  }
+	}
+
+	// for flash
+	handleDismiss = () => {
+		this.store.appState.successFlash = null;
+	}
 
 	render() {
-		const { userInfo, error, loading } = this.store;
+		const { userInfo, error, loading, errorFlash, successFlash } = this.store;
         
         const ErrorView = (
-            <Label color={'red'} size='small' style={{border:0}}>{error}</Label>
+            <Message error visible size='tiny'>{error}</Message>
 		);
+
+		var successFlashView = null;
+		if (successFlash) {
+			successFlashView = (
+                <Message success onDismiss={this.handleDismiss} content={successFlash}/>
+			);
+		}
+        var errorFlashView = null;
+        if(errorFlash) {
+            errorFlashView = (
+                <Message error onDismiss={this.handleDismiss} content={errorFlash} />
+            );
+		}
 		
 		const loaderView = (
             <Dimmer active inverted>
@@ -56,8 +74,14 @@ export default class Login extends Component {
 		return (
 			<Container text style={{ marginTop: '5em' }} >
 				{ loading === 'on' ? loaderView : null  }
-                <Grid textAlign='center' style={{ height: '100%' }} verticalAlign='middle' >
-                    <Grid.Column style={{ maxWidth: 450 }}>
+				<div>
+					{ errorFlashView }
+					{ successFlashView }
+				</div>
+				<Grid textAlign='center' style={{ height: '100%' }} verticalAlign='middle' >
+					
+					<Grid.Column style={{ maxWidth: 450 }}>
+					<Header as='h2' textAlign='center'>SIGN IN</Header>
 						<Form size='large'>
 							<Segment>
 								<Form.Field>
@@ -84,10 +108,11 @@ export default class Login extends Component {
 								<Form.Field>
                                     <div>
                                         { error !== null ? ErrorView : null }
-                                    </div>
+									</div>
+									<div></div>
                                 </Form.Field>
 								<div>
-									<Button color='violet' fluid size='small' onClick={this.handelLogin.bind(this)}>SIGN UP</Button>
+									<Button color='violet' fluid size='small' onClick={this.handelLogin.bind(this)}>SIGN IN</Button>
 								</div>
 								<Divider horizontal>Or</Divider>
 								<Social />

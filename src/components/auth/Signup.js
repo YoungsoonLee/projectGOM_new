@@ -48,13 +48,13 @@ export default class Signup extends Component {
         const {history, lastLocation} = this.props;
         //console.log(this.store.loading);
         this.store.Signup(history, lastLocation);
-	  }
+    }
 
 	render() {
         const { userInfo, error, loading } = this.store;
         
         const ErrorView = (
-            <Label color={'red'} size='small' style={{border:0}}>{error}</Label>
+            <Message error visible size='tiny'>{error}</Message>
         );
 
         const loaderView = (
