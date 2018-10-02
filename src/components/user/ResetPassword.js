@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { inject, observer } from "mobx-react";
 import { Link, withRouter } from "react-router-dom";
 
-import { Container, Label, Button, Message, Form, Header, Icon, Grid, Input, Segment } from 'semantic-ui-react'
+import { Container, Dimmer, Button, Message, Form, Header, Loader, Grid, Input, Segment } from 'semantic-ui-react'
 
 @withRouter
 @inject("store")
@@ -42,19 +42,28 @@ class ResetPassword extends Component {
     }
 
     handleResetPassword(e) {
-        const { history } = this.props;
         e.preventDefault();
-        console.log("click handleResetPassword");
+        //console.log("click handleResetPassword");
+
         this.store.setLoading('on');
+
+        const {history} = this.props;
+        var confirmPassword = this.state.confirmPassword;
+        this.setState({ confirmPassword: "" });
+
         this.store.resetPassword(
             this.props.match.params.token,
-            this.state.confirmPassword,
+            confirmPassword,
             history
         )
     }
     
     render() {
-        const { errorFlash, successFlash, userInfo } = this.store;
+        const { error, errorFlash, successFlash, userInfo, loading } = this.store;
+
+        const ErrorView = (
+            <Message error visible size='tiny'>{error}</Message>
+        );
 
         var successFlashView = null;
 		if (successFlash) {
@@ -67,10 +76,17 @@ class ResetPassword extends Component {
             errorFlashView = (
                 <Message error name="errorFlash" onDismiss={this.handleDismiss} content={errorFlash} />
             );
-		}
+        }
+        
+        const loaderView = (
+            <Dimmer active inverted>
+                <Loader size='huge'></Loader>
+            </Dimmer>
+        )
 
         return (
             <Container text style={{ marginTop: '5em' }}>
+                { loading === 'on' ? loaderView : null  }
                 <Grid>
                     <Grid.Column>
                         <div>
@@ -111,14 +127,14 @@ class ResetPassword extends Component {
                                 />
                             </Form.Field>
                             <Form.Field>
+                                <div>
+                                    { error !== null ? ErrorView : null }
+                                </div>
+                                <div></div>
+                            </Form.Field>
+                            <Form.Field>
                                 <Button color='violet' 
-                                        onClick={
-                                            ()=>this.store.resetPassword(
-                                                this.props.match.params.token,
-                                                this.state.confirmPassword,
-                                                history
-                                            )
-                                        }>Save</Button>
+                                        onClick={this.handleResetPassword.bind(this)}>Save</Button>
                             </Form.Field>
                         </Form>
 

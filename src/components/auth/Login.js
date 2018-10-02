@@ -12,19 +12,28 @@ export default class Login extends Component {
 	constructor(props) {
         super(props);
 		this.store = this.props.store.appState;
-		//console.log("login constructor");
+		console.log("login constructor");
+
+		//this.store.checkAuth();
 	}
 	
 	/*
 	componentDidMount() {
-        console.log('login componentDidMount');
+		console.log('login componentDidMount');
     }
-    
+    */
+   
     componentDidUpdate(){
-        console.log('login componentDidUpdate');
+		//console.log('login componentDidUpdate');
+		//console.log(this.store.authenticated);
+		
+		if (this.store.authenticated === true) {
+			const {history} = this.props;
+			this.store.setSuccessFlashMessage('You already logged in.');
+			history.push('/');
+		}
     }
-	*/
-
+	
     handleInputPassword = (e, { value }) => {
         this.store.userInfo.password = value;
     }
@@ -36,7 +45,7 @@ export default class Login extends Component {
 	handelLogin(e){
 		e.preventDefault();
 		{/* add the rest of the function here */}
-		console.log("click")
+		//console.log("click")
 		this.store.setLoading('on');
 		const {history, lastLocation} = this.props;
 		this.store.Login(history, lastLocation);

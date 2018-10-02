@@ -21,12 +21,15 @@ export default class AppState {
   @observable displayname;
   @observable email;
   @observable password;
+  //@observable confirmPassword;
   @observable userInfo;
   @observable loggedInUserInfo;
   @observable error;
   @observable loading;
   @observable errorFlash;
   @observable successFlash;
+  @observable profileEmail;
+  @observable profileDisplayname;
 
   constructor() {
     this.authenticated = false;
@@ -39,10 +42,13 @@ export default class AppState {
     this.displayname = '';
     this.email = '';
     this.password = '';
+    //this.confirmPassword = '';
     this.error = null;
     this.loading = 'off';
     this.errorFlash = null;
     this.successFlash = null;
+    this.profileEmail = null;
+    this.profileDisplayname = null;
 
     //for signup and login
     this.userInfo = {
@@ -52,7 +58,7 @@ export default class AppState {
     }
 
     this.loggedInUserInfo = {
-      //uid: '',
+      uid: '',
       displayname: '',
       gravatar: '',
       balance: '0',
@@ -60,11 +66,20 @@ export default class AppState {
     }
   }
 
+  @action setProfileEmail(value){
+    this.profileEmail = value;
+  }
+
+  @action setProfileDisplayname(value){
+    this.profileDisplayname = value;
+  }
+
   @action setLoading(value) {
     this.loading = value;
   }
 
   @action setError(msg) {
+    
     if (msg != null) {
       this.error = msg;
       this.setLoading('off');
@@ -77,13 +92,15 @@ export default class AppState {
     this.userInfo.displayname = '';
     this.userInfo.email = '';
     this.userInfo.password = '';
+    //this.userInfo.confirmPassword = '';
 
     this.setClearMessage();
   }
 
-  @action setAuthenticated(auth, displayname, balance, gravater) {
-    console.log("setAuth: ", displayname);
+  @action setAuthenticated(auth, uid, displayname, balance, gravater) {
+    // console.log("setAuth: ", uid, displayname);
     this.authenticated = auth;
+    this.loggedInUserInfo.uid = uid;
     this.loggedInUserInfo.displayname = displayname;
     this.loggedInUserInfo.balance = balance;
     this.loggedInUserInfo.gravatar = gravater;
@@ -94,7 +111,7 @@ export default class AppState {
 
     this.authenticated = false;
 
-    //this.loggedInUserInfo.uid = '';
+    this.loggedInUserInfo.uid = '';
     this.loggedInUserInfo.displayname = '';
     this.loggedInUserInfo.balance = '0';
     this.loggedInUserInfo.gravatar = '';
@@ -109,11 +126,13 @@ export default class AppState {
   }
 
   @action setSuccessFlashMessage(msg) {
-    this.successFlash = msg
+    this.successFlash = msg;
+    this.setLoading('off');
   }
 
   @action setErrorFlashMessage(msg) {
-    this.errorFlash = msg
+    this.errorFlash = msg;
+    this.setLoading('off');
   }
 
   // Signup
@@ -164,6 +183,7 @@ export default class AppState {
 
       }
     }
+    
   }
 
   // localLogin
@@ -231,8 +251,10 @@ export default class AppState {
       if(!auth) {
         await this.setInitLoggedInUserInfo()
       }else{
+        //console.log('check auth: ', auth.data.data);
         await this.setAuthenticated(
           true,
+          auth.data.data.Uid,
           auth.data.data.Displayname, 
           auth.data.data.Balance.toString(), 
           auth.data.data.Pciture
@@ -268,8 +290,9 @@ export default class AppState {
 
           //this.checkAuth();
 
-          // flash message
-          this.setSuccessFlashMessage('Welcome ! ' + respData.data.data.displayname);
+          // flash message ... um error ... why ??
+          // appState.setSuccessFlashMessage('Welcome ! ' + respData.data.data.displayname);
+          // this.setSuccessFlashMessage('Welcome ! ' + respData.data.data.displayname);
   
         }).catch((err)=>{
           console.log("err ", err);
@@ -364,7 +387,7 @@ export default class AppState {
       let data = null;
       try{ 
         data = await UserAPI.forgotPassword(this.userInfo.email);
-        await this.setInitUserInfo();
+        this.setInitUserInfo();
       }catch(err){
         //console.log(err);
         this.setErrorFlashMessage(err.response.data.message);
@@ -390,13 +413,113 @@ export default class AppState {
     
     if(data) {
       //this.successFlash = 'Reset Token is valid.'
-      this.this.setSuccessFlashMessage('Reset Token is valid. Change password.')
+      this.setSuccessFlashMessage('Reset Token is valid. Change password.');
     }
   }
 
 
+  async resetPassword(resetToken, confirmPassword, history) {
+    if ( !(validator.isLength(this.userInfo.password, {min:8, max: undefined})) || (validator.contains(this.userInfo.password, ' ')) ){
+      this.setError('The password must be at least 8 characters long without space.');
+    }else if ( !(validator.isLength(confirmPassword, {min:8, max: undefined})) || (validator.contains(confirmPassword, ' ')) ){
+      this.setError('The confirm password must be at least 8 characters long without space.');
+    }else if(this.userInfo.password !== confirmPassword){
+      this.setError('Password does not match.');
+    }else{
+      this.setError(null);
+    }
+
+    if(!this.error) {
+      let data = null;
+      try{ 
+        data = await UserAPI.resetPassword(resetToken, this.userInfo.password);
+        this.setInitUserInfo();
+      }catch(err){
+        //console.log(err);
+        //this.errorFlash = err.response.data.message;
+        this.setErrorFlashMessage(err.response.data.message);
+      }
+      
+      if(data) {
+        //this.successFlash = 'Password is changed. please SIGN IN.'
+        this.setSuccessFlashMessage('Password is changed. Please SIGN IN.');
+        //console.log(history);
+        history.push('/login');
+      }
+    }
+  }
 
 
+  async getProfile(history) {
+    this.setInitUserInfo();
+
+    await this.checkAuth();
+
+    if(!this.loggedInUserInfo.uid) {
+      this.errorFlash = 'Need login first';
+
+      // clear storage
+      
+      //go to login
+      history.push('/login');
+    }else{
+
+      let profile = null;
+      try{
+        profile = await UserAPI.getProfile(this.loggedInUserInfo.uid);
+      }catch(err){
+        //console.log(err);
+        //this.error = err.response.data.message;
+        this.setError(err.response.data.message);
+      }
+
+      if(profile){
+        //this.profileEmail = profile.data.Email;
+        this.setProfileEmail(profile.data.data.Email);
+        this.setProfileDisplayname(profile.data.data.Displayname);
+        //this.loggedInUserInfo._id = profile.data._id;
+        //this.loggedInUserInfo.displayName = profile.data.displayName;
+      }else{
+        //this.error = 'Something wrong to get profile.';
+        this.setError('Something wrong to get profile.');
+      }
+    }
+  }
+
+  
+  async updateProfile(history) {
+    //this.store.profileEmail, this.store.profileDisplayname
+    if ( 
+      !(validator.isLength(this.store.profileDisplayname, {min:4, max: 16})) || 
+      (validator.contains(this.store.profileDisplayname, ' ')) || 
+      !(validator.isAlphanumeric(this.store.profileDisplayname))
+      ){
+      this.setError('A displayname has 4~16 letters/numbers without space.');
+    }else if(!validator.isEmail(this.store.profileEmail)) {
+      this.setError('Please input a valid email address.');
+    }else{
+      this.setError(null);
+    }
+
+    if(!this.error) {
+      let data = null;
+      try{ 
+        data = await UserAPI.updateProfile(this.loggedInUserInfo.uid, this.store.profileDisplayname, this.store.profileEmail);
+        this.setInitUserInfo();
+      }catch(err){
+        //console.log(err);
+        this.errorFlash = err.response.data.message;
+      }
+      
+      if(data) {
+        this.setInitUserInfo();
+        this.successFlash = 'Profile is changed. please re-sign in.'
+        let { data } = await AuthAPI.logout();
+        await this.authenticate();
+        history.push('/login');
+      }
+    }
+  }
   
   
   

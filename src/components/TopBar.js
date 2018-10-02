@@ -110,7 +110,7 @@ export default class TopBar extends Component {
 			<div>
 				<Menu size='tiny' pointing borderless={true} fixed='top'>
 					<Menu.Item name='home' active={activeItem === 'home'} onClick={this.handleItemClick} />
-					<Menu.Item name='posts' active={activeItem === 'posts'} onClick={this.handleItemClick} />
+					<Menu.Item name='news' active={activeItem === 'news'} onClick={this.handleItemClick} />
 					<Menu.Item name='forum' active={activeItem === 'forum'} onClick={this.handleItemClick} />
 					{Viewpane}
 				</Menu>

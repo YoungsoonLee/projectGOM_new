@@ -21,11 +21,15 @@ export default class Signup extends Component {
     componentDidMount() {
         console.log('Signup componentDidMount');
     }
-    
-    componentDidUpdate(){
-        console.log('Signup componentDidUpdate');
-    }
     */
+   
+    componentDidUpdate(){
+		if (this.store.authenticated === true) {
+			const {history} = this.props;
+			this.store.setSuccessFlashMessage('You already logged in.');
+			history.push('/');
+		}
+    }
 
     handleInputEmail = (e, { value }) => {
         this.store.userInfo.email = value;

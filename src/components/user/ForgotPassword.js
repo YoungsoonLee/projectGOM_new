@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { inject, observer } from "mobx-react";
 import { Redirect } from "react-router-dom";
 
-import { Container, Label, Button, Message, Form, Header, Icon, Grid, Input, Segment } from 'semantic-ui-react'
+import { Container, Dimmer, Button, Message, Form, Header, Loader, Grid, Input, Segment } from 'semantic-ui-react'
 
 @inject("store")
 @observer
@@ -34,11 +34,12 @@ class ForgotPassword extends Component {
     handleForgotPassword(e) {
         console.log("click handleForgotPassword");
         this.store.setLoading('on');
-        this.store.forgotPassword()
+
+        this.store.forgotPassword();
     }
 
     render() {
-        const { errorFlash, successFlash, userInfo } = this.store;
+        const { errorFlash, successFlash, userInfo, loading } = this.store;
 
         var successFlashView = null;
 		if (successFlash) {
@@ -51,10 +52,17 @@ class ForgotPassword extends Component {
             errorFlashView = (
                 <Message error name="errorFlash" onDismiss={this.handleDismiss} content={errorFlash} />
             );
-		}
+        }
+    
+        const loaderView = (
+            <Dimmer active inverted>
+                <Loader size='huge'></Loader>
+            </Dimmer>
+        )
 
         return (
             <Container text style={{ marginTop: '5em' }}>
+                { loading === 'on' ? loaderView : null  }
                 <Grid>
                     <Grid.Column>
                         <div>

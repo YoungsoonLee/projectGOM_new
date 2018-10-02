@@ -11,7 +11,7 @@ import TopBar from "./TopBar";
 import NotFound from "./NotFound";
 import Home from "./Home";
 import { Login, Logout, Signup } from './auth/index';
-import {ConfirmEmail, InvalidConfirmEmail, ForgotPassword, ResetPassword } from './user/index';
+import {ConfirmEmail, InvalidConfirmEmail, ForgotPassword, ResetPassword, Profile } from './user/index';
 
 @withRouter
 @inject("store")
@@ -26,7 +26,8 @@ export default class App extends Component {
 	}
 	authenticate(e) {
 		if (e) e.preventDefault();
-		this.store.appState.authenticate();
+		//this.store.appState.authenticate();
+		this.store.appState.checkAuth();
 	}
 	render() {
 		const {
@@ -51,6 +52,8 @@ export default class App extends Component {
 
 						<Route path="/forgotPassword" component={ForgotPassword} />
 						<Route path="/resetPassword/:token" component={ResetPassword} />
+
+						<Route path="/profile" component={Profile} />
 
 						<Route component={NotFound}/> 
 					</Switch>

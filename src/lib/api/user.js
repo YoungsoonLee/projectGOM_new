@@ -14,3 +14,6 @@ export const confirmEmail = (confirm_token) => axios.post('/v1/user/confirmEmail
 export const resendConfirmEmail = (email) => axios.post('/v1/user/resendConfirmEmail/'+email);
 export const forgotPassword = (email) => axios.post('/v1/user/forgotPassword/'+email);
 export const isValidResetPasswordToken = (reset_token) => axios.post('/v1/user/isValidResetPasswordToken/'+reset_token);
+export const resetPassword = (resetToken, password) => axios.post('/v1/user/resetPassword',{resetToken,password});
+export const getProfile = (id) => axios.post('/v1/user/getProfile/'+id);
+export const updateProfile = (id, displayname, email) => axios.post('/v1/user/updateProfile',{id,displayname, email});
