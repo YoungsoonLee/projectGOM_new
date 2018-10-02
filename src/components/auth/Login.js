@@ -12,9 +12,10 @@ export default class Login extends Component {
 	constructor(props) {
         super(props);
 		this.store = this.props.store.appState;
-		console.log("login constructor");
+		//console.log("login constructor");
 	}
 	
+	/*
 	componentDidMount() {
         console.log('login componentDidMount');
     }
@@ -22,6 +23,7 @@ export default class Login extends Component {
     componentDidUpdate(){
         console.log('login componentDidUpdate');
     }
+	*/
 
     handleInputPassword = (e, { value }) => {
         this.store.userInfo.password = value;
@@ -40,9 +42,25 @@ export default class Login extends Component {
 		this.store.Login(history, lastLocation);
 	}
 
+	handleGotoSignup(e) {
+		e.preventDefault();
+		const {history} = this.props;
+		history.push('/signup');
+	}
+
+	handleForgotPassword(e){
+		e.preventDefault();
+		const {history} = this.props;
+		history.push('/forgotPassword');
+	}
+
 	// for flash
-	handleDismiss = () => {
-		this.store.appState.successFlash = null;
+	handleDismiss = (e, {name}) => {
+        if (name == "errorFlash") {
+            this.store.errorFlash = null;
+        }else{
+            this.store.successFlash = null;
+        }
 	}
 
 	render() {
@@ -55,13 +73,13 @@ export default class Login extends Component {
 		var successFlashView = null;
 		if (successFlash) {
 			successFlashView = (
-                <Message success onDismiss={this.handleDismiss} content={successFlash}/>
+                <Message success name="successFlash" onDismiss={this.handleDismiss} content={successFlash}/>
 			);
 		}
         var errorFlashView = null;
         if(errorFlash) {
             errorFlashView = (
-                <Message error onDismiss={this.handleDismiss} content={errorFlash} />
+                <Message error name="errorFlash" onDismiss={this.handleDismiss} content={errorFlash} />
             );
 		}
 		
@@ -118,6 +136,9 @@ export default class Login extends Component {
 								<Social />
 							</Segment>
 						</Form>
+						<Message>
+							<a style={{ cursor: 'pointer', color: 'blue' }} onClick={this.handleForgotPassword.bind(this)}>Forgot Password?</a> | New to us?  <a style={{ cursor: 'pointer', color: 'blue' }} onClick={this.handleGotoSignup.bind(this)}>Sign up</a>
+                        </Message>
 					</Grid.Column>
 				</Grid>
 			</Container>

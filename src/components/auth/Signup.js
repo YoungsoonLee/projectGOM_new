@@ -50,6 +50,12 @@ export default class Signup extends Component {
         this.store.Signup(history, lastLocation);
     }
 
+    handleGotoSignin(e) {
+        e.preventDefault();
+        const {history} = this.props;
+        history.push('/login');
+    }
+
 	render() {
         const { userInfo, error, loading } = this.store;
         
@@ -115,7 +121,7 @@ export default class Signup extends Component {
 							</Segment>
                         </Form>
                         <Message>
-                            Already join us?  <a style={{ cursor: 'pointer', color: 'blue' }} onClick={this.handleModeChanged}>Login</a>
+                            Already join us?  <a style={{ cursor: 'pointer', color: 'blue' }} onClick={this.handleGotoSignin.bind(this)}>Login</a>
                         </Message>
 					</Grid.Column>
 				</Grid>

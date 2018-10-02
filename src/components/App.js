@@ -11,7 +11,7 @@ import TopBar from "./TopBar";
 import NotFound from "./NotFound";
 import Home from "./Home";
 import { Login, Logout, Signup } from './auth/index';
-import {ConfirmEmail, InvalidConfirmEmail} from './user/index';
+import {ConfirmEmail, InvalidConfirmEmail, ForgotPassword, ResetPassword } from './user/index';
 
 @withRouter
 @inject("store")
@@ -48,6 +48,9 @@ export default class App extends Component {
 
 						<Route path="/confirmEmail/:token" component={ConfirmEmail} />
 						<Route path="/invalidConfirmEmail" component={InvalidConfirmEmail} />
+
+						<Route path="/forgotPassword" component={ForgotPassword} />
+						<Route path="/resetPassword/:token" component={ResetPassword} />
 
 						<Route component={NotFound}/> 
 					</Switch>

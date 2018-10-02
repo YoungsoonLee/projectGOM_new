@@ -200,7 +200,7 @@ export default class AppState {
         redirect.set(history,lastLocation);
 
         // flash message
-        this.setSuccessFlashMessage('Welcome ! ' + this.userInfo.displayname);
+        this.setSuccessFlashMessage('Welcome ! ' + respData.data.data.displayname);
 
       }catch(err){
         //console.log(err);
@@ -302,19 +302,105 @@ export default class AppState {
     //console.log(data);
 
     if(!data) {
-      //this.errorFlash = 'token is invalid or has expired. try resend again.';
       this.setErrorFlashMessage('token is invalid or has expired. try resend again.');
       history.push('/invalidConfirmEmail');
     }else{
-      //this.successFlash = 'email confirm success. thank you. enjoy after login.'
       this.setSuccessFlashMessage('email confirm success. thank you. enjoy after login.');
-      // go to login
       history.push('/login');
+    }
+  }
+
+  async resendConfirmEmail() {
+
+    if(!validator.isEmail(this.userInfo.email)) {
+      //this.setError('Please input a valid email address.');
+      this.setErrorFlashMessage('Please input a valid email address.');
+    }else{
+      this.setErrorFlashMessage(null);
+    }
+
+    if(!this.errorFlash) {
+      let data = null;
+      try{ 
+        data = await UserAPI.resendConfirmEmail(this.userInfo.email);
+        this.setInitUserInfo();
+      }catch(err){
+        //console.log(err);
+        //this.setError(err.response.data.message);
+        this.setErrorFlashMessage(err.response.data.message);
+      }
+      
+      if(data) {
+        this.setSuccessFlashMessage('Resend succeed.');
+      }
+    }
+  }
+
+  async logout(history) {
+    // check auth\
+    // do not need call api
+    // let { data } = await AuthAPI.logout();
+
+    await this.checkAuth();
+
+    await this.setInitUserInfo();
+
+    await this.setInitLoggedInUserInfo();
+
+    this.setSuccessFlashMessage("Bye~~~, Hopely see you soon.");
+
+    history.push('/');
+    
+  }
+
+  async forgotPassword(){
+    if(!validator.isEmail(this.userInfo.email)) {
+      this.setErrorFlashMessage('Please input a valid email address.');
+    }else{
+      this.setErrorFlashMessage(null);
+    }
+
+    if(!this.errorFlash) {
+      let data = null;
+      try{ 
+        data = await UserAPI.forgotPassword(this.userInfo.email);
+        await this.setInitUserInfo();
+      }catch(err){
+        //console.log(err);
+        this.setErrorFlashMessage(err.response.data.message);
+      }
+      
+      if(data) {
+        this.setSuccessFlashMessage('Send a password reset token to yor email. please check your email inbox or spam box.');
+      }
+    }
+  }
+
+  async isValidResetPasswordToken(token, history) {
+    let data = null;
+    try{ 
+      data = await UserAPI.isValidResetPasswordToken(token);
+      //console.log(data);
+    }catch(err){
+      //console.log(err);
+      //this.errorFlash = err.response.data.message;
+      this.setErrorFlashMessage(err.response.data.message);
+      history.push('/forgotPassword');
+    }
+    
+    if(data) {
+      //this.successFlash = 'Reset Token is valid.'
+      this.this.setSuccessFlashMessage('Reset Token is valid. Change password.')
     }
   }
 
 
 
+
+  
+  
+  
+  // ------------------------------------------------------------------------------------------------------------
   // not use below
   async fetchData(pathname, id) {
     let { data } = await axios.get(

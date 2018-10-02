@@ -2,25 +2,24 @@ import React, { Component } from 'react';
 import { inject, observer } from "mobx-react";
 import { Redirect } from "react-router-dom";
 
-import { Container, Label, Button, Message, Form, Header, Grid, Input } from 'semantic-ui-react'
+import { Container, Label, Button, Message, Form, Header, Icon, Grid, Input, Segment } from 'semantic-ui-react'
 
 @inject("store")
 @observer
-class InvalidConfirmEmail extends Component {
+class ForgotPassword extends Component {
     constructor(props) {
         super(props);
         this.store = this.props.store.appState;
     }
+    
+    /*
+    componentDidMount() {
+        //this.store.setInitUserInfo();
+    }
+    */
 
     handleInputEmail = (e, { value }) => {
         this.store.userInfo.email = value;
-    }
-
-    handleResendConfirmEmail(e) {
-        e.preventDefault();
-        console.log("click handleResendConfirmEmail");
-        this.store.setLoading('on');
-        this.store.resendConfirmEmail();
     }
 
     // for flash
@@ -30,7 +29,13 @@ class InvalidConfirmEmail extends Component {
         }else{
             this.store.successFlash = null;
         }
-	}
+    }
+    
+    handleForgotPassword(e) {
+        console.log("click handleForgotPassword");
+        this.store.setLoading('on');
+        this.store.forgotPassword()
+    }
 
     render() {
         const { errorFlash, successFlash, userInfo } = this.store;
@@ -57,13 +62,13 @@ class InvalidConfirmEmail extends Component {
                             { successFlashView }
                         </div>
                         <Header as='h2' icon dividing>
-                            Unconfirmed email.
+                            Forgot Password
                         </Header>
                         <Header.Subheader>
-                            Your account need to confirm email.
+                            It will send a password reset token to you.
                         </Header.Subheader>
                         <Header.Subheader>
-                            If you want to resend, input your email and click resend.
+                            Input your email and click send.
                         </Header.Subheader>
 
                         <Form>
@@ -80,16 +85,15 @@ class InvalidConfirmEmail extends Component {
                                 />
                             </Form.Field>
                             <Form.Field>
-                                <Button color='violet' onClick={this.handleResendConfirmEmail.bind(this)}>Resend</Button>
+                                <Button color='violet' onClick={this.handleForgotPassword.bind(this)}>Send</Button>
                             </Form.Field>
                         </Form>
 
                     </Grid.Column>
                 </Grid>
             </Container>
-        );
+        )
     }
 }
 
-
-export default InvalidConfirmEmail;
+export default ForgotPassword;

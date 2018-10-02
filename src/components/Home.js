@@ -23,8 +23,12 @@ export default class Home extends Component {
 	}
 	
 	// for flash
-	handleDismiss = () => {
-		this.store.appState.successFlash = null;
+	handleDismiss = (e, {name}) => {
+        if (name == "errorFlash") {
+            this.store.appState.errorFlash = null;
+        }else{
+            this.store.appState.successFlash = null;
+        }
 	}
 
 	render() {
@@ -33,13 +37,13 @@ export default class Home extends Component {
 		var successFlashView = null;
 		if (successFlash) {
 			successFlashView = (
-                <Message success onDismiss={this.handleDismiss} content={successFlash}/>
+                <Message success name="successFlash" onDismiss={this.handleDismiss} content={successFlash}/>
 			);
 		}
         var errorFlashView = null;
         if(errorFlash) {
             errorFlashView = (
-                <Message error onDismiss={this.handleDismiss} content={errorFlash} />
+                <Message error name="errorFlash" onDismiss={this.handleDismiss} content={errorFlash} />
             );
 		}
 		

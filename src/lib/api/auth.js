@@ -8,8 +8,7 @@ export const checkEmail = (email) => axios.get('/api/v1.0/auth/exists/email/' + 
 //export const localLogin = ({email, password}) => axios.post('/api/v1.0/auth/login/local', {email, password});
 //export const socialLogin = ({provider, accessToken}) => axios.post('/api/v1.0/auth/login/' + provider, {accessToken});
 //export const socialRegister = ({displayName,provider,accessToken}) => axios.post('/api/v1.0/auth/register/' + provider, {displayName,accessToken});
-
-export const logout = () => axios.post('/api/v1.0/auth/logout');
+//export const logout = () => axios.post('/api/v1.0/auth/logout');
 
 // new for RESTfulapi_go
 export const checkDisplayName = (displayname) => axios.get('/v1/auth/checkDisplayName/' + displayname);
@@ -17,3 +16,4 @@ export const localRegister = ({displayname,email,password}) => axios.post('/v1/a
 export const localLogin = ({displayname, password}) => axios.post('/v1/auth/login', {displayname, password});
 export const checkLoginStatus = (token) => axios.get('/v1/auth/checkLogin', {headers: {Authorization: token}});
 export const socialAuth = ({provider, accessToken, email, providerId, picture}) => axios.post('/v1/auth/social', {provider, accessToken, email, providerId, picture});
+export const logout = () => axios.post('/v1/auth/logout');

@@ -17,6 +17,7 @@ export default class TopBar extends Component {
 	constructor(props) {
 		super(props);
 		this.store = this.props.store.appState;
+		console.log("top bar constructor");
 	}
 
 	/*
@@ -62,8 +63,6 @@ export default class TopBar extends Component {
 
 		if (name === 'home') {
 			this.props.history.push('/');
-		}else if(name ==='forum'){
-			console.log("go forum");
 		}else{
 			this.props.history.push('/'+name);
 		}
@@ -71,6 +70,9 @@ export default class TopBar extends Component {
 
 	handleLogout() {
 		console.log("logout")
+
+		const {history} = this.props;
+		this.store.logout(history);
 	}
 
 	render() {

@@ -12,6 +12,7 @@ export default class TopNav extends Component {
 	}
 
 	authenticate(e) {
+		console.log("nav authenticate")
 		if (e) e.preventDefault();
 		this.props.store.authenticate();
 	}

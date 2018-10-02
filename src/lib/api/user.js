@@ -11,3 +11,6 @@ export const updateProfile = (id, password) => axios.post('/api/v1.0/user/update
 */
 
 export const confirmEmail = (confirm_token) => axios.post('/v1/user/confirmEmail/'+confirm_token);
+export const resendConfirmEmail = (email) => axios.post('/v1/user/resendConfirmEmail/'+email);
+export const forgotPassword = (email) => axios.post('/v1/user/forgotPassword/'+email);
+export const isValidResetPasswordToken = (reset_token) => axios.post('/v1/user/isValidResetPasswordToken/'+reset_token);
