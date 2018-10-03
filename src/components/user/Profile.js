@@ -38,12 +38,14 @@ class Profile extends Component {
     handleUpdateProfile(e) {
         e.preventDefault();
         const { history } = this.props;
+        this.store.setLoading('on');
         this.store.updateProfile(history);
     }
 
     handleUpdatePassword(e) {
         e.preventDefault();
         const { history } = this.props;
+        this.store.setLoading('on');
         this.store.updatePassword(this.state.confirmPassword,history);
     }
 
@@ -56,11 +58,11 @@ class Profile extends Component {
     }
 
     render() {
-        const { history } = this.props;
+        //const { history } = this.props;
         const { error, errorFlash, successFlash, profileEmail, profileDisplayname, loggedInUserInfo, userInfo, loading } = this.store;
 
         const ErrorView = (
-            <Label basic color='red' size='small' style={{border:0}}>{error}</Label>
+            <Message error visible size='tiny'>{error}</Message>
         );
 
 		var successFlashView = null;
@@ -85,6 +87,10 @@ class Profile extends Component {
         return (
             <Container text style={{ marginTop: '5em' }}>
                 { loading === 'on' ? loaderView : null  }
+                <div>
+					{ errorFlashView }
+					{ successFlashView }
+				</div>
                 <div className="page posts">
                     <h3>Profile</h3> <p>If you want to change, Input new value and click the change button.</p>
                     <Form className='attached fluid segment' style={{ maxWidth: 450 }}>
@@ -94,8 +100,6 @@ class Profile extends Component {
                     </Form>
                     <hr />
                     <h3>Change Password</h3>
-                    { errorFlashView }
-                    { successFlashView }
                     <Form className='attached fluid segment' style={{ maxWidth: 450 }}>
                         <Form.Input label='New Password' name='password' placeholder='new password' type='password' value={userInfo.password} onChange={this.handleInputPassword}/>
                         <Form.Input label='Confirm Password' name='confirmPassword' placeholder='confirm password' type='password' value={this.state.confirmPassword} onChange={this.handleInputConfirmPassword}/>

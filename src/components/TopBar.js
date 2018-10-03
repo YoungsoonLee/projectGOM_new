@@ -72,7 +72,7 @@ export default class TopBar extends Component {
 		console.log("logout")
 
 		const {history} = this.props;
-		this.store.logout(history);
+		this.store.logout(history, "");
 	}
 
 	render() {

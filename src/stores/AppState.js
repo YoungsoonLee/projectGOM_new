@@ -288,7 +288,7 @@ export default class AppState {
 
           redirect.set(history,lastLocation);
 
-          //this.checkAuth();
+          // this.checkAuth();
 
           // flash message ... um error ... why ??
           // appState.setSuccessFlashMessage('Welcome ! ' + respData.data.data.displayname);
@@ -359,7 +359,7 @@ export default class AppState {
     }
   }
 
-  async logout(history) {
+  async logout(history, goto) {
     // check auth\
     // do not need call api
     // let { data } = await AuthAPI.logout();
@@ -370,9 +370,14 @@ export default class AppState {
 
     await this.setInitLoggedInUserInfo();
 
-    this.setSuccessFlashMessage("Bye~~~, Hopely see you soon.");
+    //this.setSuccessFlashMessage("Bye~~~, Hopely see you soon.");
 
-    history.push('/');
+    if (goto == "") {
+      history.push('/');
+    }else{
+      history.push(goto);
+    }
+    
     
   }
 
@@ -488,39 +493,43 @@ export default class AppState {
 
   
   async updateProfile(history) {
-    //this.store.profileEmail, this.store.profileDisplayname
+    // TODO: compare original value !!!
+
+    // using flash message
     if ( 
-      !(validator.isLength(this.store.profileDisplayname, {min:4, max: 16})) || 
-      (validator.contains(this.store.profileDisplayname, ' ')) || 
-      !(validator.isAlphanumeric(this.store.profileDisplayname))
+      !(validator.isLength(this.profileDisplayname, {min:4, max: 16})) || 
+      (validator.contains(this.profileDisplayname, ' ')) || 
+      !(validator.isAlphanumeric(this.profileDisplayname))
       ){
-      this.setError('A displayname has 4~16 letters/numbers without space.');
-    }else if(!validator.isEmail(this.store.profileEmail)) {
-      this.setError('Please input a valid email address.');
+      //this.setError('A displayname has 4~16 letters/numbers without space.');
+      this.setErrorFlashMessage('A displayname has 4~16 letters/numbers without space.')
+    }else if(!validator.isEmail(this.profileEmail)) {
+      //this.setError('Please input a valid email address.');
+      this.setErrorFlashMessage('Please input a valid email address.')
     }else{
-      this.setError(null);
+      this.setErrorFlashMessage(null);
     }
 
-    if(!this.error) {
+    if(!this.errorFlash) {
       let data = null;
       try{ 
-        data = await UserAPI.updateProfile(this.loggedInUserInfo.uid, this.store.profileDisplayname, this.store.profileEmail);
-        this.setInitUserInfo();
+        data = await UserAPI.updateProfile(this.loggedInUserInfo.uid, this.profileDisplayname, this.profileEmail);
       }catch(err){
-        //console.log(err);
-        this.errorFlash = err.response.data.message;
+        this.setErrorFlashMessage(err.response.data.message);
       }
       
       if(data) {
-        this.setInitUserInfo();
-        this.successFlash = 'Profile is changed. please re-sign in.'
-        let { data } = await AuthAPI.logout();
-        await this.authenticate();
+        await this.setInitLoggedInUserInfo(); //first remove cookie
+        await this.checkAuth();
+        this.setSuccessFlashMessage('Profile is changed. please re-sign in.');
         history.push('/login');
       }
     }
   }
   
+  async updatePassword(password, history) {
+    // using error message
+  }
   
   
   // ------------------------------------------------------------------------------------------------------------
