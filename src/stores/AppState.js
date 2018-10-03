@@ -28,8 +28,12 @@ export default class AppState {
   @observable loading;
   @observable errorFlash;
   @observable successFlash;
+
+  @observable originProfileEmail;
+  @observable originProfileDisplayname;
   @observable profileEmail;
   @observable profileDisplayname;
+  @observable profileProvider;
 
   constructor() {
     this.authenticated = false;
@@ -47,8 +51,12 @@ export default class AppState {
     this.loading = 'off';
     this.errorFlash = null;
     this.successFlash = null;
+
+    this.originProfileEmail = null;
+    this.originProfileDisplayname =null;
     this.profileEmail = null;
     this.profileDisplayname = null;
+    this.profileProvider = null;
 
     //for signup and login
     this.userInfo = {
@@ -67,11 +75,17 @@ export default class AppState {
   }
 
   @action setProfileEmail(value){
+    this.originProfileEmail = value;
     this.profileEmail = value;
   }
 
   @action setProfileDisplayname(value){
+    this.originProfileDisplayname = value;
     this.profileDisplayname = value;
+  }
+
+  @action setProfileProvider(value){
+    this.profileProvider = value;
   }
 
   @action setLoading(value) {
@@ -456,15 +470,17 @@ export default class AppState {
 
 
   async getProfile(history) {
-    this.setInitUserInfo();
+    //this.setInitUserInfo();
 
     await this.checkAuth();
 
     if(!this.loggedInUserInfo.uid) {
-      this.errorFlash = 'Need login first';
+      this.setErrorFlashMessage('Need login first');
 
       // clear storage
-      
+      await this.setInitLoggedInUserInfo(); //first remove cookie
+      await this.checkAuth();
+
       //go to login
       history.push('/login');
     }else{
@@ -473,20 +489,17 @@ export default class AppState {
       try{
         profile = await UserAPI.getProfile(this.loggedInUserInfo.uid);
       }catch(err){
-        //console.log(err);
-        //this.error = err.response.data.message;
-        this.setError(err.response.data.message);
+        this.setErrorFlashMessage(err.response.data.message);
       }
 
       if(profile){
-        //this.profileEmail = profile.data.Email;
         this.setProfileEmail(profile.data.data.Email);
         this.setProfileDisplayname(profile.data.data.Displayname);
-        //this.loggedInUserInfo._id = profile.data._id;
-        //this.loggedInUserInfo.displayName = profile.data.displayName;
+        this.setProfileProvider(profile.data.data.Provider);
+
+        this.setLoading('off');
       }else{
-        //this.error = 'Something wrong to get profile.';
-        this.setError('Something wrong to get profile.');
+        this.setErrorFlashMessages('Something wrong to get profile.');
       }
     }
   }
@@ -494,41 +507,73 @@ export default class AppState {
   
   async updateProfile(history) {
     // TODO: compare original value !!!
-
-    // using flash message
-    if ( 
-      !(validator.isLength(this.profileDisplayname, {min:4, max: 16})) || 
-      (validator.contains(this.profileDisplayname, ' ')) || 
-      !(validator.isAlphanumeric(this.profileDisplayname))
-      ){
-      //this.setError('A displayname has 4~16 letters/numbers without space.');
-      this.setErrorFlashMessage('A displayname has 4~16 letters/numbers without space.')
-    }else if(!validator.isEmail(this.profileEmail)) {
-      //this.setError('Please input a valid email address.');
-      this.setErrorFlashMessage('Please input a valid email address.')
+    if (this.originProfileDisplayname == this.profileDisplayname && this.originProfileEmail == this.profileEmail) {
+      // do nothing
+      this.setLoading('off');
     }else{
-      this.setErrorFlashMessage(null);
+      // using flash message
+      if ( 
+        !(validator.isLength(this.profileDisplayname, {min:4, max: 16})) || 
+        (validator.contains(this.profileDisplayname, ' ')) || 
+        !(validator.isAlphanumeric(this.profileDisplayname))
+        ){
+        //this.setError('A displayname has 4~16 letters/numbers without space.');
+        this.setErrorFlashMessage('A displayname has 4~16 letters/numbers without space.')
+      }else if(!validator.isEmail(this.profileEmail)) {
+        //this.setError('Please input a valid email address.');
+        this.setErrorFlashMessage('Please input a valid email address.')
+      }else{
+        this.setErrorFlashMessage(null);
+      }
+
+      if(!this.errorFlash) {
+        let data = null;
+        try{ 
+          data = await UserAPI.updateProfile(this.loggedInUserInfo.uid, this.profileDisplayname, this.profileEmail);
+        }catch(err){
+          this.setErrorFlashMessage(err.response.data.message);
+        }
+        
+        if(data) {
+          await this.setInitLoggedInUserInfo(); //first remove cookie
+          await this.checkAuth();
+          this.setSuccessFlashMessage('Profile is changed. please re-sign in.');
+          history.push('/login');
+        }
+      }
+    }
+  }
+  
+  async updatePassword(newpassword,confirmPassword, history) {
+    this.setInitUserInfo();
+
+    // using error message
+
+    if ( !(validator.isLength(newpassword, {min:8, max: undefined})) || (validator.contains(newpassword, ' ')) ){
+      this.setError('The password must be at least 8 characters long without space.');
+    }else if ( !(validator.isLength(confirmPassword, {min:8, max: undefined})) || (validator.contains(confirmPassword, ' ')) ){
+      this.setError('The confirm password must be at least 8 characters long without space.');
+    }else if(newpassword !== confirmPassword){
+      this.setError('New Password and Confirm Password does not match.');
+    }else{
+      this.setError(null);
     }
 
-    if(!this.errorFlash) {
+    if(!this.error) {
       let data = null;
       try{ 
-        data = await UserAPI.updateProfile(this.loggedInUserInfo.uid, this.profileDisplayname, this.profileEmail);
+        data = await UserAPI.updatePassword(this.loggedInUserInfo.uid, newpassword);
       }catch(err){
-        this.setErrorFlashMessage(err.response.data.message);
+        this.setError(err.response.data.message);
       }
       
       if(data) {
         await this.setInitLoggedInUserInfo(); //first remove cookie
         await this.checkAuth();
-        this.setSuccessFlashMessage('Profile is changed. please re-sign in.');
+        this.setSuccessFlashMessage('Password is changed. please re-sign in.');
         history.push('/login');
       }
     }
-  }
-  
-  async updatePassword(password, history) {
-    // using error message
   }
   
   
