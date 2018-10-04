@@ -105,6 +105,15 @@ export default class TopBar extends Component {
 				</Menu.Menu>
 			)
 		}
+
+		var paymentPane = null;
+		if(authenticated) {
+			paymentPane = (
+				<Menu.Item name='payment' active={activeItem === 'payment'} onClick={this.handleItemClick} >
+					<Icon name='diamond'/>{numeral(this.store.loggedInUserInfo.balance).format('0,0')}
+				</Menu.Item>
+			)
+		}
 		
 		return (
 			<div>
@@ -112,6 +121,9 @@ export default class TopBar extends Component {
 					<Menu.Item name='home' active={activeItem === 'home'} onClick={this.handleItemClick} />
 					<Menu.Item name='news' active={activeItem === 'news'} onClick={this.handleItemClick} />
 					<Menu.Item name='forum' active={activeItem === 'forum'} onClick={this.handleItemClick} />
+
+					{paymentPane}
+					
 					{Viewpane}
 				</Menu>
 			</div>

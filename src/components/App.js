@@ -12,6 +12,7 @@ import NotFound from "./NotFound";
 import Home from "./Home";
 import { Login, Logout, Signup } from './auth/index';
 import {ConfirmEmail, InvalidConfirmEmail, ForgotPassword, ResetPassword, Profile } from './user/index';
+import { Payment } from './billing/index';
 
 @withRouter
 @inject("store")
@@ -46,14 +47,13 @@ export default class App extends Component {
 						<Route exact path="/" component={Home}/>
 						<Route path="/login" component={Login}/>
 						<Route path="/signup" component={Signup}/>
-
 						<Route path="/confirmEmail/:token" component={ConfirmEmail} />
 						<Route path="/invalidConfirmEmail" component={InvalidConfirmEmail} />
-
 						<Route path="/forgotPassword" component={ForgotPassword} />
 						<Route path="/resetPassword/:token" component={ResetPassword} />
-
 						<Route path="/profile" component={Profile} />
+
+						<Route exact path="/payment" component={Payment} />
 
 						<Route component={NotFound}/> 
 					</Switch>

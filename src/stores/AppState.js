@@ -265,7 +265,9 @@ export default class AppState {
       if(!auth) {
         await this.setInitLoggedInUserInfo()
       }else{
+        
         //console.log('check auth: ', auth.data.data);
+
         await this.setAuthenticated(
           true,
           auth.data.data.UID,

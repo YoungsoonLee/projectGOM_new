@@ -60,6 +60,7 @@
     "pushstate-server": "^3.0.1",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
+    "react-load-script": "0.0.6",
     "react-router-dom": "latest",
     "react-router-last-location": "^1.1.0",
     "rfx-core": "^1.5.3",
