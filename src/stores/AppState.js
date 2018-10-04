@@ -66,7 +66,7 @@ export default class AppState {
     }
 
     this.loggedInUserInfo = {
-      uid: '',
+      UID: '',
       displayname: '',
       gravatar: '',
       balance: '0',
@@ -111,10 +111,10 @@ export default class AppState {
     this.setClearMessage();
   }
 
-  @action setAuthenticated(auth, uid, displayname, balance, gravater) {
+  @action setAuthenticated(auth, UID, displayname, balance, gravater) {
     // console.log("setAuth: ", uid, displayname);
     this.authenticated = auth;
-    this.loggedInUserInfo.uid = uid;
+    this.loggedInUserInfo.UID = UID;
     this.loggedInUserInfo.displayname = displayname;
     this.loggedInUserInfo.balance = balance;
     this.loggedInUserInfo.gravatar = gravater;
@@ -125,7 +125,7 @@ export default class AppState {
 
     this.authenticated = false;
 
-    this.loggedInUserInfo.uid = '';
+    this.loggedInUserInfo.UID = '';
     this.loggedInUserInfo.displayname = '';
     this.loggedInUserInfo.balance = '0';
     this.loggedInUserInfo.gravatar = '';
@@ -268,7 +268,7 @@ export default class AppState {
         //console.log('check auth: ', auth.data.data);
         await this.setAuthenticated(
           true,
-          auth.data.data.Uid,
+          auth.data.data.UID,
           auth.data.data.Displayname, 
           auth.data.data.Balance.toString(), 
           auth.data.data.Pciture
@@ -342,6 +342,8 @@ export default class AppState {
       this.setErrorFlashMessage('token is invalid or has expired. try resend again.');
       history.push('/invalidConfirmEmail');
     }else{
+      await this.setInitLoggedInUserInfo(); //first remove cookie
+      await this.checkAuth();
       this.setSuccessFlashMessage('email confirm success. thank you. enjoy after login.');
       history.push('/login');
     }
@@ -432,6 +434,8 @@ export default class AppState {
     
     if(data) {
       //this.successFlash = 'Reset Token is valid.'
+      await this.setInitLoggedInUserInfo(); //first remove cookie
+      await this.checkAuth();
       this.setSuccessFlashMessage('Reset Token is valid. Change password.');
     }
   }
@@ -474,7 +478,7 @@ export default class AppState {
 
     await this.checkAuth();
 
-    if(!this.loggedInUserInfo.uid) {
+    if(!this.loggedInUserInfo.UID) {
       this.setErrorFlashMessage('Need login first');
 
       // clear storage
@@ -487,7 +491,7 @@ export default class AppState {
 
       let profile = null;
       try{
-        profile = await UserAPI.getProfile(this.loggedInUserInfo.uid);
+        profile = await UserAPI.getProfile(this.loggedInUserInfo.UID);
       }catch(err){
         this.setErrorFlashMessage(err.response.data.message);
       }
@@ -529,7 +533,7 @@ export default class AppState {
       if(!this.errorFlash) {
         let data = null;
         try{ 
-          data = await UserAPI.updateProfile(this.loggedInUserInfo.uid, this.profileDisplayname, this.profileEmail);
+          data = await UserAPI.updateProfile(this.loggedInUserInfo.UID, this.profileDisplayname, this.profileEmail);
         }catch(err){
           this.setErrorFlashMessage(err.response.data.message);
         }
@@ -562,7 +566,7 @@ export default class AppState {
     if(!this.error) {
       let data = null;
       try{ 
-        data = await UserAPI.updatePassword(this.loggedInUserInfo.uid, newpassword);
+        data = await UserAPI.updatePassword(this.loggedInUserInfo.UID, newpassword);
       }catch(err){
         this.setError(err.response.data.message);
       }
