@@ -15,6 +15,7 @@ export default class Login extends Component {
 		console.log("login constructor");
 
 		//this.store.checkAuth();
+		this.store.setInitUserInfo();
 	}
 	
 	/*
