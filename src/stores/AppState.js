@@ -107,8 +107,7 @@ export default class AppState {
     this.userInfo.email = '';
     this.userInfo.password = '';
     //this.userInfo.confirmPassword = '';
-
-    this.setClearMessage();
+    //this.setClearMessage();
   }
 
   @action setAuthenticated(auth, UID, displayname, balance, gravater) {
@@ -266,14 +265,14 @@ export default class AppState {
         await this.setInitLoggedInUserInfo()
       }else{
         
-        //console.log('check auth: ', auth.data.data);
+        console.log('check auth: ', auth.data.data);
 
         await this.setAuthenticated(
           true,
-          auth.data.data.UID,
-          auth.data.data.Displayname, 
-          auth.data.data.Balance.toString(), 
-          auth.data.data.Pciture
+          auth.data.data.uid,
+          auth.data.data.displayname, 
+          auth.data.data.balance.toString(), 
+          auth.data.data.picture
         );
       }
     }else{
@@ -382,7 +381,7 @@ export default class AppState {
     // do not need call api
     // let { data } = await AuthAPI.logout();
 
-    await this.checkAuth();
+    //await this.checkAuth();
 
     await this.setInitUserInfo();
 
@@ -485,7 +484,7 @@ export default class AppState {
 
       // clear storage
       await this.setInitLoggedInUserInfo(); //first remove cookie
-      await this.checkAuth();
+      //await this.checkAuth();
 
       //go to login
       history.push('/login');
@@ -499,11 +498,12 @@ export default class AppState {
       }
 
       if(profile){
-        this.setProfileEmail(profile.data.data.Email);
-        this.setProfileDisplayname(profile.data.data.Displayname);
-        this.setProfileProvider(profile.data.data.Provider);
-
+        //console.log(profile.data.data)
+        this.setProfileEmail(profile.data.data.email);
+        this.setProfileDisplayname(profile.data.data.displayname);
+        this.setProfileProvider(profile.data.data.provider);
         this.setLoading('off');
+
       }else{
         this.setErrorFlashMessages('Something wrong to get profile.');
       }
@@ -542,7 +542,7 @@ export default class AppState {
         
         if(data) {
           await this.setInitLoggedInUserInfo(); //first remove cookie
-          await this.checkAuth();
+          //await this.checkAuth();
           this.setSuccessFlashMessage('Profile is changed. please re-sign in.');
           history.push('/login');
         }
@@ -575,7 +575,7 @@ export default class AppState {
       
       if(data) {
         await this.setInitLoggedInUserInfo(); //first remove cookie
-        await this.checkAuth();
+        //await this.checkAuth();
         this.setSuccessFlashMessage('Password is changed. please re-sign in.');
         history.push('/login');
       }

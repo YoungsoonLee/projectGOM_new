@@ -25,6 +25,7 @@ class ResetPassword extends Component {
     }
 
     handleInputPassword = (e, { value }) => {
+        this.store.setClearMessage();
         this.store.userInfo.password = value;
     }
 

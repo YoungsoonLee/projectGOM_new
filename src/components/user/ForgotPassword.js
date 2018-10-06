@@ -19,6 +19,7 @@ class ForgotPassword extends Component {
     */
 
     handleInputEmail = (e, { value }) => {
+        this.store.setClearMessage();
         this.store.userInfo.email = value;
     }
 
@@ -33,6 +34,7 @@ class ForgotPassword extends Component {
     
     handleForgotPassword(e) {
         console.log("click handleForgotPassword");
+
         this.store.setLoading('on');
 
         this.store.forgotPassword();

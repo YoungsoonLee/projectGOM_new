@@ -13,6 +13,7 @@ class InvalidConfirmEmail extends Component {
     }
 
     handleInputEmail = (e, { value }) => {
+        this.store.setClearMessage();
         this.store.userInfo.email = value;
     }
 
