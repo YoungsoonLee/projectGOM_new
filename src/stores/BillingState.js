@@ -5,41 +5,52 @@ import * as BillingAPI from '../lib/api/billing';
 
 // store at billing
 export default class BillingState {
-  @observable chagrgeItems;
-  @observable errorFlash;
-  @observable successFlash;
-  @observable historyMode;
+    @observable chagrgeItems;
+    @observable errorFlash;
+    @observable successFlash;
+    @observable historyMode;
 
-  constructor() {
-    this.chagrgeItems = [];
-    this.errorFlash = null;
-    this.successFlash = null;
-    this.historyMode = 'charge';
-  }
+    constructor() {
+        this.chagrgeItems = [];
+        this.errorFlash = null;
+        this.successFlash = null;
+        this.historyMode = 'charge';
+    }
 
-  @action setHistoryMode(mode) {
-    this.historyMode = mode;
-  }
+    @action setHistoryMode(mode) {
+        this.historyMode = mode;
+    }
 
-  @action setChagrgeItems(items) {
-    this.chagrgeItems = items;
-  }
+    @action setChagrgeItems(items) {
+        this.chagrgeItems = items;
+    }
 
-async fetchChagrgeItems() {
-      let data = null;
-      try{
-        data = await BillingAPI.getChargeItems();
-      }catch(e){
-        this.errorFlash = err.response.data.message;
-      }
 
-      if(data) {
-        //console.log(data.data.chargeItems);
-        this.setChagrgeItems(data.data.chargeItems);
-      }else{
-        this.errorFlash = 'Something wrong to get items. try agin.';
-      }
-  }
+    @action setSuccessFlashMessage(msg) {
+        this.successFlash = msg;
+    }
+
+    @action setErrorFlashMessage(msg) {
+        this.errorFlash = msg;
+    }
+
+    async fetchChagrgeItems() {
+        let data = null;
+        try{
+            data = await BillingAPI.getChargeItems();
+        }catch(e){
+            //this.errorFlash = err.response.data.message;
+            this.setErrorFlashMessage(err.response.data.message);
+        }
+
+        if(data) {
+            //console.log(data.data.chargeItems);
+            // itemId, itemName, itemPrice
+            this.setChagrgeItems(data.data.chargeItems);
+        }else{
+            this.errorFlash = 'Something wrong to get payment items. try agin.';
+        }
+    }
 
   async openPay(user_id, item_id, history) {
         //-------

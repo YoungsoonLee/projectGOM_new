@@ -5,12 +5,11 @@ import { Link, withRouter } from "react-router-dom";
 import { Container, Dimmer, Loader, Segment, Card, Icon, Button, Image, Message } from 'semantic-ui-react'
 
 //import Protected from "../wrapper/Protected";
-
-//import ChargeDataWrapper from '../wrapper/ChargeDataWrapper';
+import ChargeDataWrapper from '../wrapper/ChargeDataWrapper';
 import Script from 'react-load-script'
 
 //@Protected
-//@ChargeDataWrapper
+@ChargeDataWrapper
 @withRouter
 @inject("store")
 @observer
